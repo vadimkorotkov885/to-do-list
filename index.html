@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Список дел</title>
+		<link rel="stylesheet" href="style.css" />
+	</head>
+
+	<body>
+		<div id="to-do-list">
+			<div class="header">
+				<h1>{{ header || 'Welcome' }}</h1>
+				<button v-if="editing" @click="doEdit(false)" class="btn btn-cancel">
+					Назад
+				</button>
+				<button v-else @click="doEdit(true)" class="btn btn-primry">
+					Добавить дело
+				</button>
+			</div>
+
+			<div v-if="editing" class="add-item-form">
+				<input
+					@keyup.enter="saveItem"
+					type="text"
+					v-model="newItem"
+					placeholder="Задание"
+				/>
+				<label>
+					<input type="checkbox" v-model="newItemHighPriority" />
+					Высокий приоритет
+				</label>
+				<button @click="saveItem" class="btn btn-primary">Добавить дело</button>
+			</div>
+			<p v-if="items.length === 0">Отличная работа! Вы выполнили все дела!</p>
+			<ul>
+				<li
+					v-for="item in reversedItems"
+					@click="togglePurchased(item)"
+					:key="item.id"
+					class="static-class"
+					:class="{strikeout: item.purchased, priority: item.highPriority}"
+				>
+					{{item.label}}
+				</li>
+			</ul>
+		</div>
+		<script src="https://unpkg.com/vue@3"></script>
+		<script>
+			const shoppingListApp = Vue.createApp({
+				data() {
+					return {
+						header: 'Список дел',
+						editing: false,
+						newItem: '',
+						newItemHighPriority: false,
+						items: [
+							{
+								id: 1,
+								label: 'Выкинуть мусор',
+								purchased: false,
+								highPriority: false,
+							},
+							{
+								id: 2,
+								label: 'Сходить в магазин',
+								purchased: false,
+								highPriority: false,
+							},
+							{
+								id: 3,
+								label: 'Выгулять собаку',
+								purchased: false,
+								highPriority: true,
+							},
+						],
+					}
+				},
+				computed: {
+					reversedItems() {
+						return [...this.items].reverse()
+					},
+				},
+				methods: {
+					saveItem() {
+						this.items.push({
+							id: this.items.length + 1,
+							label: this.newItem,
+							highPriority: this.newItemHighPriority,
+						})
+						this.newItem = ''
+						this.newItemHighPriority = false
+					},
+					doEdit(editing) {
+						this.editing = editing
+						this.newItem = ''
+						this.newItemHighPriority = false
+					},
+					togglePurchased(item) {
+						item.purchased = !item.purchased
+					},
+				},
+			}).mount('#to-do-list')
+		</script>
+	</body>
+</html>
